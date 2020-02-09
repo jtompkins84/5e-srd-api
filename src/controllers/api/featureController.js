@@ -13,9 +13,9 @@ exports.index = async (req, res, next) => {
 };
 
 exports.show = async (req, res, next) => {
-  await Feature.findOne({ index: req.params.index })
+  await Feature.find({ index: req.params.index })
     .then(data => {
-      if (data) {
+      if (data && data.length) {
         res.status(200).json(data);
       } else {
         res.status(404).json({ error: 'Not found' });
@@ -23,5 +23,37 @@ exports.show = async (req, res, next) => {
     })
     .catch(err => {
       next(err);
+    });
+};
+
+exports.showFeatureForClass = async (req, res, next) => {
+  await Feature.find({
+      index: req.params.index,
+      'class.url': `/api/classes/${req.params.classIndex}` 
+    })
+    .then(data => {
+      if (data && data.length) {
+        res.status(200).json(data);
+      } else {
+        res.status(404).json({ error: 'Not found' });
+      }
+    })
+    .catch(err => {
+      next(err)
+    });
+};
+
+exports.showFeaturesForClass = async (req, res, next) => {
+  await Feature.find({ 'class.url': `/api/classes/${req.params.classIndex}` })
+    .sort({ index: 'asc' })
+    .then(data => {
+      if (data && data.length) {
+        res.status(200).json(data);
+      } else {
+        res.status(404).json({ error: 'Not found' });
+      }
+    })
+    .catch(err => {
+      next(err)
     });
 };
